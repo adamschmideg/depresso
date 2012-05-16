@@ -1,0 +1,36 @@
+{
+  "name": "depresso",
+  "version": "0.0.1",
+  "author": {
+    "name": "Adam Schmideg",
+    "email": "adam@schmideg.net",
+    "url": "http://adam.schmideg.net"
+  },
+  "description": "Dependency resolution with json path expressions",
+  "dependencies": {
+    "spahql": "*",
+    "dep-graph": "*"
+  },
+  "directories": {
+    "lib": "src-gen"
+  },
+  "keywords": [
+    "dependency", "resolution", "json"
+  ],
+  "contributors": [
+    {
+      "name": "Adam Schmideg",
+      "email": "adam@schmideg.net"
+    }
+  ],
+  "license": {
+    "type": "MIT"
+  },
+  "repository": {
+    "type": "mercurial",
+    "url": "https://bitbucket.org/adamschmideg/depresso"
+  },
+  "devDependencies": {
+    "coffee-script": "1.1.x"
+  }
+}
