@@ -20,12 +20,17 @@ class Node
   value: -> /*Value*/
   setValue: (/*Value*/value)  -> /*Value*/
   path: -> /*Path*/
-  globExpression: (/*Expression*/expression) -> /*Array[Path]*/
+
+globExpression = (/*Expression*/expression, /*Node*/node) -> /*Array[Path]*/
+
+Globbable = Expression | (Node) -> Array[Path]
 
 class NodeDependency
   constructor: (/*Node*/targetNode, /*Array[Node]*/ requiredNodes, /*Map[String,Node]->Value*/ calculateFn) ->
 
-resolve = (/*Node*/rootNode, /*Array[NodeDependency]*/ nodeDependencies, /*Array[Node]*/ emptyNodes) -> /*Node*/
+globNodeDependency = (/*Node*/rootNode, /*Expression*/target, /*Array[Globbable]*/requirements, calculateFn) -> /*Array[NodeDependency]*/
+
+resolveNodes = (/*Node*/rootNode, /*Array[NodeDependency]*/ nodeDependencies, /*Array[Node]*/ emptyNodes) -> /*Node*/
 
 
 class Globber
@@ -57,13 +62,16 @@ class SpahqlGlobber
 class Dependency
   # Parameters:
   #  - target: 
-  constructor: (@target, @expressions, @resolve) ->
-
-class PathDependency
-  constructor: (@path, @requiredPaths, @resolve) ->
+  constructor: (@targetExpression, @globbables, @resolveFn) ->
 
 class Resolver
-  constructor: (@globber, @dependencies) ->
+  constructor: (data, dependencies) ->
+    @db = spahql.db data
+    @nodeDependencies = []
+    for dep in dependencies
+      targetNodes = globExpression dep.targetExpression
+      for node in targetNodes
+        nodeDep = _globNodeDependency node, dep.globbables, dep.resolveFn
 
   # Return an array of `PathDependency` instances
   globPaths: ->
