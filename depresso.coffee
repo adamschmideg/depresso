@@ -1,6 +1,7 @@
 _ = require 'underscore'
 _s = require 'underscore.string'
 spahql = require 'spahql'
+DepGraph = require 'dep-graph'
 
 # Concepts:
 #  - path: A unique string
@@ -43,6 +44,7 @@ glob = (expression, contextNode) ->
 
 @resolve = (data, dependencies, wantedExpressions) ->
   db = spahql.db data
+  # glob expressions
   nodeDeps = []
   for dep in dependencies
     for nodePath in glob(dep.target, db)
@@ -54,7 +56,12 @@ glob = (expression, contextNode) ->
         depends: dependNodes
         calculate: dep.calculate
       nodeDeps.push nodeDep
-  nodeDeps
+  # get dependency resolution order
+  graph = new DepGraph
+  for dep in nodeDeps
+    for required in _.values dep.depends
+      graph.add dep.target, required
+  graph
 
 @testing =
   glob: glob
