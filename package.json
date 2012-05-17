@@ -10,7 +10,8 @@
   "dependencies": {
     "spahql": "*",
     "dep-graph": "*",
-    "underscore": "*"
+    "underscore": "*",
+    "underscore.string": "*"
   },
   "directories": {
     "lib": "src-gen"

@@ -1,4 +1,5 @@
 _ = require 'underscore'
+_s = require 'underscore.string'
 spahql = require 'spahql'
 
 # Concepts:
@@ -12,15 +13,27 @@ notImplemented = -> throw new Error 'Not implemented'
 pr = console.log
 
 
+_root = (node) ->
+  root = node
+  while root.parent()
+    root = root.parent()
+  root
+
 glob = (expression, contextNode) ->
   result = null
+  #pr 'glob', expression, contextNode
   if _.isString expression
-    result = contextNode.select expression
+    if _s.startsWith expression, '/'
+      result = glob expression[1...expression.length], _root contextNode
+    else if _s.startsWith expression, '../'
+      result = glob expression[3...expression.length], contextNode.parent()
+    else
+      result = contextNode.select(expression).paths()
   else if _.isFunction expression
     result = expression(contextNode)
   else
     throw new Error "What #{expression}"
-  result.paths()
+  result
 
 
 @resolve = (data, dependencies, wantedExpressions) ->

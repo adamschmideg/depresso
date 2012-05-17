@@ -1,3 +1,4 @@
+spahql = require 'spahql'
 
 @MISSING = -1
 
@@ -15,3 +16,5 @@
     age: 77
     birthDate: @MISSING
   ] 
+
+@db = spahql.db @data
