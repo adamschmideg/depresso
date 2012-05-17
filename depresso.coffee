@@ -10,7 +10,7 @@ spahql = require 'spahql'
 #    (resolution), and what paths it needs as a prerequisite.
 
 notImplemented = -> throw new Error 'Not implemented'
-pr = console.log
+pr = (x...) -> console.log x[0], JSON.stringify(x[1], null, 2)
 
 
 _root = (node) ->
@@ -19,16 +19,21 @@ _root = (node) ->
     root = root.parent()
   root
 
+# Supported expressions:
+#  - '/foo' starts at the root
+#  - '../foo' start from parent
+#  - './foo' and 'foo' start from current
 glob = (expression, contextNode) ->
   result = null
-  #pr 'glob', expression, contextNode
   if _.isString expression
     if _s.startsWith expression, '/'
-      result = glob expression[1...expression.length], _root contextNode
+      result = _root(contextNode).select(expression).paths()
     else if _s.startsWith expression, '../'
       result = glob expression[3...expression.length], contextNode.parent()
+    else if _s.startsWith expression, './'
+      result = glob expression[2...expression.length], contextNode
     else
-      result = contextNode.select(expression).paths()
+      result = contextNode.select('/' + expression).paths()
   else if _.isFunction expression
     result = expression(contextNode)
   else
@@ -40,7 +45,7 @@ glob = (expression, contextNode) ->
   db = spahql.db data
   nodeDeps = []
   for dep in dependencies
-    for nodePath in glob dep.target, db
+    for nodePath in glob(dep.target, db)
       dependNodes = {}
       for name,path of dep.depends
         dependNodes[name] = glob(path, db.select nodePath)

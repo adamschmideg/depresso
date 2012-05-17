@@ -11,10 +11,10 @@ deps = [
 ,
   target: '/friends/*/birthDate'
   depends: 
-    parent: (x) -> x.parent()
+    age: '../age'
   calculate: (args) ->
     d = new Date()
-    d.getYear() - args.parent.age
+    d.getYear() - args.age
 ]
 
 result = resolve data, deps, '//birthDate'
