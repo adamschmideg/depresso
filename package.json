@@ -9,7 +9,8 @@
   "description": "Dependency resolution with json path expressions",
   "dependencies": {
     "spahql": "*",
-    "dep-graph": "*"
+    "dep-graph": "*",
+    "underscore": "*"
   },
   "directories": {
     "lib": "src-gen"

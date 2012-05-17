@@ -1,16 +1,5 @@
-{resolve} = require './despresso'
-
-data =
-  user:
-    name: 'Joe'
-    age: 33
-  friends: [
-    name: 'Mary'
-    age: 22
-  ,
-    name: 'Dick'
-    age: 77
-  ] 
+{resolve} = require '../depresso'
+{data} = require './data'
 
 deps = [
   target: '/user/birthDate'
@@ -29,3 +18,4 @@ deps = [
 ]
 
 result = resolve data, deps, '//birthDate'
+console.log result
