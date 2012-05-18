@@ -41,7 +41,21 @@ glob = (expression, contextNode) ->
     throw new Error "What #{expression}"
   result
 
+isAtomic = (expression) ->
+  not (_s.include expression, '//' or _s.include expression, '*')
 
+# Get a value or values on path
+value = (db, paths, atomic) ->
+  values = []
+  for p in paths
+    values = values.concat db.select(p).values()
+  if atomic
+    if values.length > 1
+      throw new Error "Expected atomic for #{ paths }"
+    values[0]
+  else
+    values
+  
 @resolve = (data, dependencies, wantedExpressions...) ->
   db = spahql.db data
   # glob expressions
@@ -50,7 +64,9 @@ glob = (expression, contextNode) ->
     for nodePath in glob(dep.target, db)
       dependNodes = {}
       for name,path of dep.depends
-        dependNodes[name] = glob(path, db.select nodePath)
+        dependNodes[name] =
+          atom: isAtomic path
+          paths: glob(path, db.select nodePath)
       nodeDeps[nodePath] =
         depends: dependNodes
         calculate: dep.calculate
@@ -61,7 +77,7 @@ glob = (expression, contextNode) ->
   graph = new DepGraph
   for path,dep of nodeDeps
     for depends in _.values dep.depends
-      for depend in depends
+      for depend in depends.paths
         graph.add path, depend
   shouldCalculate = []
   for w in wanted
@@ -70,7 +86,20 @@ glob = (expression, contextNode) ->
         shouldCalculate.push required
     unless w in shouldCalculate
       shouldCalculate.push w
-  shouldCalculate
+  # perform calculation
+  for path in shouldCalculate
+    dep = nodeDeps[path]
+    if dep
+      calculation = {}
+      calculation.calculate = dep.calculate
+      for name,depends of dep.depends
+        calculation[name] = value db, depends.paths, depends.atom
+      result = calculation.calculate()
+      db.select(path).replace result
+    else
+      if _.isUndefined db.select(path).value()
+        throw new Error "Expected dependency #{ path } not met"
+  db.value()
 
 @testing =
   glob: glob

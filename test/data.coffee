@@ -8,7 +8,7 @@ spahql = require 'spahql'
     price: @MISSING
   products: [
     name: 'Bag'
-    netPrice: 25
+    netPrice: 20
     tax: 0.1
     price: @MISSING
   ,

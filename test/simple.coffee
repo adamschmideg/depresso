@@ -7,18 +7,18 @@ deps = [
   depends: 
     netPrice: '../netPrice'
     tax: '../tax'
-  calculate: =>
+  calculate: ->
     @netPrice * (1 + @tax)
 ,
   target: '/general/price'
   depends:
     prices: '/products//price'
-  calculate: =>
+  calculate: ->
     _.reduce(
-      prices
+      @prices
       (x,y) -> x+y
       0)
 ]
 
 result = resolve data, deps, '/general/price'
-console.log result
+console.log result.general.price is 34, result
