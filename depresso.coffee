@@ -42,26 +42,35 @@ glob = (expression, contextNode) ->
   result
 
 
-@resolve = (data, dependencies, wantedExpressions) ->
+@resolve = (data, dependencies, wantedExpressions...) ->
   db = spahql.db data
   # glob expressions
-  nodeDeps = []
+  nodeDeps = {}
   for dep in dependencies
     for nodePath in glob(dep.target, db)
       dependNodes = {}
       for name,path of dep.depends
         dependNodes[name] = glob(path, db.select nodePath)
-      nodeDep =
-        target: nodePath
+      nodeDeps[nodePath] =
         depends: dependNodes
         calculate: dep.calculate
-      nodeDeps.push nodeDep
+  wanted = []
+  for exp in wantedExpressions
+    wanted = wanted.concat glob(exp, db)
   # get dependency resolution order
   graph = new DepGraph
-  for dep in nodeDeps
-    for required in _.values dep.depends
-      graph.add dep.target, required
-  graph
+  for path,dep of nodeDeps
+    for depends in _.values dep.depends
+      for depend in depends
+        graph.add path, depend
+  shouldCalculate = []
+  for w in wanted
+    for required in graph.getChain w
+      unless required in shouldCalculate
+        shouldCalculate.push required
+    unless w in shouldCalculate
+      shouldCalculate.push w
+  shouldCalculate
 
 @testing =
   glob: glob

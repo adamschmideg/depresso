@@ -1,21 +1,24 @@
 {resolve} = require '../depresso'
 {data} = require './data'
+_ = require 'underscore'
 
 deps = [
-  target: '/user/birthDate'
+  target: '/products//price'
   depends: 
-    age: '/user/age'
-  calculate: (args) ->
-    d = new Date()
-    d.getYear() - args.age
+    netPrice: '../netPrice'
+    tax: '../tax'
+  calculate: =>
+    @netPrice * (1 + @tax)
 ,
-  target: '/friends/*/birthDate'
-  depends: 
-    age: '../age'
-  calculate: (args) ->
-    d = new Date()
-    d.getYear() - args.age
+  target: '/general/price'
+  depends:
+    prices: '/products//price'
+  calculate: =>
+    _.reduce(
+      prices
+      (x,y) -> x+y
+      0)
 ]
 
-result = resolve data, deps, '//birthDate'
+result = resolve data, deps, '/general/price'
 console.log result
