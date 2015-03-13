@@ -1,3 +1,5 @@
+[![depresso API Documentation](https://www.omniref.com/js/npm/depresso.png)](https://www.omniref.com/js/npm/depresso)
+
 You have a deeply nested object with some missing values.
 You also have some rules how to calculate a value from other values.
 `Depresso` takes an object and the calculation rules,
